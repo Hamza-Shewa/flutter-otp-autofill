@@ -5,8 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
-import androidx.activity.result.IntentSenderRequest.*
-import androidx.annotation.NonNull;
+import androidx.activity.result.IntentSenderRequest.Builder
+import androidx.annotation.NonNull
 import com.google.android.gms.auth.api.identity.GetPhoneNumberHintIntentRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.phone.SmsRetriever
@@ -16,7 +16,7 @@ import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
-import io.flutter.plugin.common.MethodChannel.Result
+import io.flutter.plugin.common.PluginRegistry
 
 /// Channel
 const val channelName: String = "otp_surfstudio"
@@ -36,7 +36,8 @@ const val getAppSignatureMethod: String = "getAppSignature"
 const val senderTelephoneNumber: String = "senderTelephoneNumber"
 
 /** OtpTextEditControllerPlugin */
-class OTPPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
+class OTPPlugin : FlutterPlugin, MethodCallHandler, PluginRegistry.ActivityResultListener,
+    ActivityAware {
 
     private lateinit var channel: MethodChannel
 
@@ -44,17 +45,16 @@ class OTPPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private var smsRetrieverBroadcastReceiver: SmsRetrieverReceiver? = null
     private var activity: Activity? = null
     private val request = GetPhoneNumberHintIntentRequest.builder().build()
-    private var context: Context? = null
-    private var lastResult: Result? = null
-    private var binding: ActivityPluginBinding? = null
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         context = flutterPluginBinding.applicationContext
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, channelName)
-        channel.setMethodCallHandler(this);
+        channel.setMethodCallHandler(this)
     }
+    private var context: Context? = null
+    private var lastResult: MethodChannel.Result? = null
 
-    override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
+    override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: MethodChannel.Result) {
         when (call.method) {
             startListenRetriever -> {
                 listenRetriever(result)
@@ -84,7 +84,7 @@ class OTPPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         }
     }
 
-    private fun showNumberHint(result: Result) {
+    private fun showNumberHint(result: MethodChannel.Result) {
         lastResult = result
 
         if (activity == null) return
@@ -103,7 +103,6 @@ class OTPPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 )
             }
     }
-
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
@@ -146,7 +145,7 @@ class OTPPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         binding.addActivityResultListener(this)
     }
 
-    private fun listenUserConsent(@NonNull call: MethodCall, @NonNull result: Result) {
+    private fun listenUserConsent(@NonNull call: MethodCall, @NonNull result: MethodChannel.Result) {
         val senderNumber = call.argument<String?>(senderTelephoneNumber)
         // Start listening for SMS User Consent broadcasts from senderPhoneNumber
         // The Task<Void> will be successful if SmsRetriever was able to start
@@ -158,7 +157,7 @@ class OTPPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         }
     }
 
-    private fun listenRetriever(@NonNull result: Result) {
+    private fun listenRetriever(@NonNull result: MethodChannel.Result) {
         if (activity != null) {
             lastResult = result
             val client = SmsRetriever.getClient(activity!!)
