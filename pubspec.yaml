@@ -9,12 +9,12 @@ dependencies:
     sdk: flutter
 
 dev_dependencies:
-  dependency_validator: ^3.0.0
+  dependency_validator: ^5.0.2
   flutter_test:
     sdk: flutter
 
-  mocktail: ^0.2.0
-  surf_lint_rules: ^2.0.0
+  mocktail: ^1.0.4
+  surf_lint_rules: ^3.1.0
 
 environment:
   sdk: ">=2.18.0 <4.0.0"
