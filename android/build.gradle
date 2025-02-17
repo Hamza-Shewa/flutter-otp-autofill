@@ -2,13 +2,16 @@ group 'ru.surfstudio.otp_autofill'
 version '1.0-SNAPSHOT'
 
 buildscript {
+    ext {
+        agp_version = '8.7.0'
+    }
     repositories {
         google()
         mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.5.2'
+        classpath "com.android.tools.build:gradle:$agp_version"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.0"
     }
 }
