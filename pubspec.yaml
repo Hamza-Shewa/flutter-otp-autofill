@@ -14,7 +14,7 @@ dev_dependencies:
     sdk: flutter
 
   mocktail: ^1.0.4
-  surf_lint_rules: ^3.1.0
+  surf_lint_rules: ^4.0.0
 
 environment:
   sdk: ">=2.18.0 <4.0.0"
